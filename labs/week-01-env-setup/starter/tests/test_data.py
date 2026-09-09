@@ -27,7 +27,6 @@ def test_split_ratios() -> None:
 
    assert len(x_train) + len(x_test) == len(df)
 
-   pytest.approx(..., abs=0.01)
-
+   assert len(x_test) / len(df) == pytest.approx(settings.test_size, abs=0.01)
    #raise NotImplementedError
 
