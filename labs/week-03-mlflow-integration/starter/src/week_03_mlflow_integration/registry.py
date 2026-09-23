@@ -194,6 +194,7 @@ def trace_alias(settings: Settings) -> dict:
     metrics = run.data.metrics
     run_name = run.data.tags.get("mlflow.runName")
     git_commit = run.data.tags.get("mlflow.source.git.commit")
+    git_dirty = run.data.tags.get("git_dirty")
 
     return {
         "model_uri": f"models:/{name}@{alias}",
@@ -202,6 +203,7 @@ def trace_alias(settings: Settings) -> dict:
         "run_id": mv.run_id,
         "run_name": run_name,
         "git_commit": git_commit,
+        "git_dirty": git_dirty,
         "params": params,
         "metrics": metrics,
         "version_tags": mv.tags,

@@ -196,6 +196,7 @@ def log_training_run(
          )
         # The signature is what populates the UI's Schema tab, and what a
         # serving runtime reads to validate incoming requests (Week 9).
+        mlflow.set_tag("git_dirty", str(git_dirty()))
 
         return RunResult(run_id=run.info.run_id, run_name=run_name, metrics=metrics)
 
