@@ -212,32 +212,45 @@ def trace_alias(settings: Settings) -> dict:
 def roll_back(
     settings: Settings, to_version: str, reason: str
 ) -> tuple[str, ModelVersion] | None:
-    """Point both aliases back at an earlier version, and record why.
+    """Point both aliases back at an earlier version, and record why."""
+    client = MlflowClient(settings.mlflow_tracking_uri)
+    name = settings.registered_model_name
 
-    A rollback is the same pointer move as a promotion, in the other direction.
-    Rolling back what a serving container actually runs is Week 10; this is
-    the registry half.
+    # 1. Find the version settings.model_alias points at NOW.
+    current = client.get_model_version_by_alias(name, settings.model_alias)
+    from_version = current.version
 
-    TODO(student) — Exercise 7:
-    1. Find the version settings.model_alias points at NOW.
-    2. Refuse, with ValueError and before anything moves, if `to_version`
-       - is the version the alias already points at, or
-       - has no `promoted_at` tag. A version that never passed promotion is
-         not a known-good target, and "rolling back" to it would be an
-         unreviewed promotion in disguise.
-       (A `to_version` that does not exist already raises in get_model_version.)
-    3. Tag the version you are rolling back FROM with
-         rolled_back_at   now, UTC, ISO 8601
-         rolled_back_to   to_version
-         rollback_reason  reason
-    4. Move BOTH aliases, settings.model_alias and "champion", to `to_version`.
-    5. Return (the version you rolled back from, the ModelVersion the alias
-       now resolves to).
-    Delete the Exercise 7 skip markers in tests/test_registry.py.
-    """
-    _ = (settings, to_version, reason)  # silence unused-argument warnings until you implement
-    return None  # placeholder — the CLI reports this as "not implemented yet"
+    # `to_version` not existing already raises inside get_model_version.
+    target = client.get_model_version(name, to_version)
 
+    # 2. Refuse before anything moves.
+    if to_version == from_version:
+        raise ValueError(
+            f"{settings.model_alias!r} already points at version {to_version}."
+        )
+    if not target.tags.get("promoted_at"):
+        raise ValueError(
+            f"version {to_version} has no 'promoted_at' tag — it was never "
+            "promoted, so it is not a known-good rollback target."
+        )
+
+    # 3. Tag the version being rolled back FROM.
+    client.set_model_version_tag(
+        name,
+        from_version,
+        "rolled_back_at",
+        datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    )
+    client.set_model_version_tag(name, from_version, "rolled_back_to", to_version)
+    client.set_model_version_tag(name, from_version, "rollback_reason", reason)
+
+    # 4. Move BOTH aliases to to_version.
+    client.set_registered_model_alias(name, settings.model_alias, to_version)
+    client.set_registered_model_alias(name, "champion", to_version)
+
+    # 5. Return (version rolled back from, ModelVersion the alias now resolves to).
+    new_current = client.get_model_version_by_alias(name, settings.model_alias)
+    return (from_version, new_current)
 
 def load_aliased_model(settings: Settings):
     """Load the model the alias currently points at.
