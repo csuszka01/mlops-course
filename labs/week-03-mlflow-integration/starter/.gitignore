@@ -7,9 +7,7 @@ __pycache__/
 .pytest_cache/
 *.pyc
 *.pyo
-*.pyd
 *.egg-info/
-pytest-cache*
 
 # Docker Compose volumes directory (if using bind mounts)
 volumes/
