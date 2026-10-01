@@ -46,7 +46,15 @@ def build_measurements(raw_dir: Path, out_path: Path) -> int:
     """
     paths = batch_paths(raw_dir)
     _ = (pd, paths)  # keep the names meaningful until you implement the body
-    return 0  # placeholder — the CLI reports this as "not implemented yet"
+
+    merged_df = pd.concat(
+        (pd.read_csv(f) for f in paths),
+        ignore_index=True
+    )
+
+    merged_df.to_csv(out_path, index=False)
+
+    return merged_df.shape[0]  # placeholder — the CLI reports this as "not implemented yet"
 
 
 def file_md5(path: Path) -> str:
