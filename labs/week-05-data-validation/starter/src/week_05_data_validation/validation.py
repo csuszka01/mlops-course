@@ -54,7 +54,12 @@ def validate_frame(frame: pd.DataFrame, schema, source: str = "") -> dict:
     #     `failure_cases` table to `_add_failures`.
     # After the block, return `report`.
     # Reference: https://pandera.readthedocs.io/en/stable/lazy_validation.html
-    raise NotImplementedError("validate_frame is not written yet (Exercise 1).")
+    try:
+        schema.validate(frame, lazy=True)  # checks every rule, then reports all failures
+    except pa.errors.SchemaErrors as exc:
+        _add_failures(report=report, cases=exc.failure_cases)
+
+    return report
 
 
 def _add_failures(report: dict, cases: pd.DataFrame) -> None:

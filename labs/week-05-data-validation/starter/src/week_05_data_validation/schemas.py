@@ -44,6 +44,18 @@ class RawMeasurements(pa.DataFrameModel):
     # `diabetes_pedigree` above 0, and 0 or 1 for `outcome`.
     # Reference: https://pandera.readthedocs.io/en/stable/dataframe_models.html
     measurement_date: Series[pa.DateTime] = pa.Field(nullable=False)
+    pregnancies: Series[int] = pa.Field(nullable=False, ge=0, le=MAX_PREGNANCIES)
+    glucose: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_GLUCOSE)
+    blood_pressure: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_BLOOD_PRESSURE)
+    skin_thickness: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_SKIN_THICKNESS)
+    insulin: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_INSULIN)
+    bmi: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_BMI)
+    diabetes_pedigree: Series[float] = pa.Field(nullable=False, gt=0, le=MAX_PEDIGREE)
+    age: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_AGE)
+    outcome: Series[int] = pa.Field(nullable=False, isin=[0, 1])
+
+
+    #blood_pressure,skin_thickness,insulin,bmi,diabetes_pedigree,age,outcome
 
     class Config:
         name = "RawMeasurements"
@@ -64,6 +76,23 @@ class ModelInput(pa.DataFrameModel):
     # in that order. In the five SENTINEL_COLUMNS, a 0 must fail and a missing
     # value must pass. The other columns keep their RawMeasurements rules.
     ...
+    measurement_date: Series[pa.DateTime] = pa.Field(nullable=False)
+    pregnancies: Series[int] = pa.Field(nullable=False, ge=0, le=MAX_PREGNANCIES)
+#   -------SENTINELS-------------
+    glucose: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_GLUCOSE)
+    blood_pressure: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_BLOOD_PRESSURE)
+    skin_thickness: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_SKIN_THICKNESS)
+    insulin: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_INSULIN)
+    bmi: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_BMI)
+#--------------------------------
+    diabetes_pedigree: Series[float] = pa.Field(nullable=False, gt=0, le=MAX_PEDIGREE)
+    age: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_AGE)
+
+
+    
+    outcome: Series[int] = pa.Field(nullable=False, isin=[0, 1])
+
+    #SENTINEL_COLUMNS = ("glucose", "blood_pressure", "skin_thickness", "insulin", "bmi")
 
     class Config:
         name = "ModelInput"
