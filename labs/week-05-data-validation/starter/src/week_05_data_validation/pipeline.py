@@ -67,8 +67,16 @@ def validate(settings: Settings) -> dict:
     # Write the report to settings.validation_report_path. Then, if the data
     # failed, raise ValidationFailed with a message that names the number of
     # failure cases. Return the report.
-    raise NotImplementedError("pipeline.validate is not written yet (Exercise 4).")
-
+    report = validate_frame(frame, RawMeasurements, source.name)
+    report["sentinel_zeros"] = sentinel_counts(frame)
+    path = settings.validation_report_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(report, indent=2, default=str))
+    if not report["passed"]:
+        raise ValidationFailed(
+            f"{source.name} failed validation: {report['n_failure_cases']} failure cases"
+        )
+    return report
 
 def prepare(settings: Settings) -> dict:
     """Stage 1: split the versioned dataset into train and test CSVs.
@@ -78,6 +86,8 @@ def prepare(settings: Settings) -> dict:
     """
     # TODO(student) Exercise 4: stop here unless the last validation passed.
     # `_require_validated` does that check.
+    _require_validated(settings)
+
     source = _require_measurements(settings)
     frame = load_measurements(source)
     train_frame, test_frame = split_measurements(frame, settings)

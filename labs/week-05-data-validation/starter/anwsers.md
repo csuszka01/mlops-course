@@ -15,3 +15,24 @@
       —  glucose            greater_than_or_equal_to(0)      TypeError("'>=' not supp
 
 - glucose két hibát is okozott, float helyett string értéke volt egy sorban, aztán emiatt a range check sem futott le rajta
+
+
+## 4.1
+
+- gate nélkül bekerült a hibás sor a train, test dataset-be
+- a modell használná a training során a hibás adatot
+
+## 4.2
+
+- ha nem talál sikeres validate-et akkor megáll
+- _require_validated(settings)
+
+
+## 4.3 
+
+- prepare skipped
+
+- validate futott mert schemas.py megváltozott
+- train, eval is futott ugyanez a file változása miatt
+
+- nem kell ujratanítani a modellt, mert a MAX_AGE validációja változott, az adat nem
