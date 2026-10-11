@@ -116,9 +116,15 @@ def prepare_model_input(frame) -> tuple:
     # frame[MODEL_INPUT_COLUMNS] with missing values. Check the result against
     # ModelInput, and raise ValidationFailed if it fails. Return the features
     # as float64, the type `predict_one` sends, and the ModelInput report.
-    features = frame[FEATURE_COLUMNS]
-    labels = frame[TARGET_COLUMN]
-    return features, labels, {}
+    converted = to_nullable(frame[MODEL_INPUT_COLUMNS])
+    report = validate_frame(converted, ModelInput, "model input")
+    if not report["passed"]:
+        raise ValidationFailed(
+            f"Model input failed validation: {report['n_failure_cases']} failure cases"
+        )
+    features = converted[FEATURE_COLUMNS].astype("float64")
+    labels = converted[TARGET_COLUMN]
+    return features, labels, report
 
 
 def train(settings: Settings) -> dict:
