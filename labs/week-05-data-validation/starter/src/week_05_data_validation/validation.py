@@ -99,6 +99,10 @@ def to_nullable(frame: pd.DataFrame) -> pd.DataFrame:
     # TODO(student) Exercise 3: in each of the SENTINEL_COLUMNS that `converted`
     # has, change the column to the nullable type "Float64" and replace 0 with
     # pd.NA. Leave every other column as it is.
+    
+    for col in SENTINEL_COLUMNS:
+        if col in converted.columns:
+            converted[col] = converted[col].astype("Float64").replace(0, pd.NA)
     return converted
 
 

@@ -76,14 +76,14 @@ class ModelInput(pa.DataFrameModel):
     # in that order. In the five SENTINEL_COLUMNS, a 0 must fail and a missing
     # value must pass. The other columns keep their RawMeasurements rules.
     ...
-    measurement_date: Series[pa.DateTime] = pa.Field(nullable=False)
+    #measurement_date: Series[pa.DateTime] = pa.Field(nullable=False)
     pregnancies: Series[int] = pa.Field(nullable=False, ge=0, le=MAX_PREGNANCIES)
 #   -------SENTINELS-------------
-    glucose: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_GLUCOSE)
-    blood_pressure: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_BLOOD_PRESSURE)
-    skin_thickness: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_SKIN_THICKNESS)
-    insulin: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_INSULIN)
-    bmi: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_BMI)
+    glucose: Series[float] = pa.Field(nullable=True, gt=0, le=MAX_GLUCOSE)
+    blood_pressure: Series[float] = pa.Field(nullable=True, gt=0, le=MAX_BLOOD_PRESSURE)
+    skin_thickness: Series[float] = pa.Field(nullable=True, gt=0, le=MAX_SKIN_THICKNESS)
+    insulin: Series[float] = pa.Field(nullable=True, gt=0, le=MAX_INSULIN)
+    bmi: Series[float] = pa.Field(nullable=True, gt=0, le=MAX_BMI)
 #--------------------------------
     diabetes_pedigree: Series[float] = pa.Field(nullable=False, gt=0, le=MAX_PEDIGREE)
     age: Series[float] = pa.Field(nullable=False, ge=0, le=MAX_AGE)
