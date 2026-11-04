@@ -51,5 +51,35 @@
 
 # 3
 
-# 4
+    - 1: Minden sor egy külön API hívás, külön frame validáció a /predict handler során.
+    
+    - 2: Ha előre ismert időpontokban jön az adatcsomag, pl minden este, akkor a batch jó választás lehet. Ha a felhasználónak azonnal kell a válasz, akkor az online a megoldás
+    
+    - 3: A percentilisek jobban reprezentálják a teljesítményt. a Mean-t nagyon felhúzhatja egyetlen lassú hívás, amit a p95 kiszűr
 
+# 4
+    ## curl vs trace
+        - curl localhost:5542/health
+            
+            "model_version":"1",
+            "run_id":"691e65ba604b48d49ad2d7688947f9ab",
+            "gate_verdict":"GO","schema_version":"1.0.0",
+            "model_source":"registry champion"}(week-03-mlflow-integration)
+            
+        - make trace
+            
+            2. Version      : 1  (aliases: ['champion', 'staging'])
+            3. Run          : 691e65ba604b48d49ad2d7688947f9ab  (dvc-logreg)
+            ...
+            8. Gate         : GO  (criteria v1.0.0, 0 failed, 4 skipped)
+            Champion     : version 1
+    ## request test
+        - glucose 148   200 OK
+        - glucose 0     422, {"detail":{"failures":{"greater_than(0)":1},"schema_version":"1.0.0"}} 
+    ## make image NO-GO modellel
+        - az elején leáll hibával, mivel a gate NO-GO döntése detektálva lett 
+        
+        
+    ## registry is down
+    
+        - null lesz a model, emiatt az image használhatatlan. Ha a konténer induláskor tölti be akkor restart után képes betölteni az image-et. Nem szükséges új image-et build-elni

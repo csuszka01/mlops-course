@@ -51,9 +51,26 @@ def online_score(client: Any, frame: pd.DataFrame, url: str = "/predict") -> dic
     # Return a dict with mode ("online"), rows, wall_clock_s, rows_per_second,
     # p50_ms, p95_ms, max_ms and failed.
     # Reference: https://docs.python.org/3/library/statistics.html#statistics.quantiles
-    return {"mode": "online", "rows": 0, "wall_clock_s": 0.0,
-            "rows_per_second": 0.0, "p50_ms": 0.0, "p95_ms": 0.0, "max_ms": 0.0,
-            "failed": 0}
+    
+    payloads = to_payloads(frame)
+    times = []
+    failed = 0
+
+    start = time.perf_counter()
+    for body in payloads:
+        t0 = time.perf_counter()
+        response = client.post(url, json=body)
+        times.append((time.perf_counter() - t0) * 1000)
+        if response.status_code != 200:
+            failed += 1
+    wall = time.perf_counter() - start
+
+    q = statistics.quantiles(times, n=100, method="inclusive")
+    
+    
+    return {"mode": "online", "rows": len(payloads), "wall_clock_s": wall,
+            "rows_per_second": len(payloads) / wall, "p50_ms": q[49], "p95_ms": q[94], "max_ms": max(times),
+            "failed": failed}
 
 
 def format_comparison(batch: dict, online: dict) -> str:

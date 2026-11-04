@@ -94,7 +94,7 @@ stages:
     outs:
     - path: models/mlflow_run_id.json
       hash: md5
-      md5: 13462946d29cd9e71e368377c965dc95
+      md5: f66b3a9c2c1de2f3cbccf541930cb429
       size: 82
     - path: models/model.pkl
       hash: md5
@@ -109,7 +109,7 @@ stages:
       size: 8041
     - path: models/mlflow_run_id.json
       hash: md5
-      md5: 13462946d29cd9e71e368377c965dc95
+      md5: f66b3a9c2c1de2f3cbccf541930cb429
       size: 82
     - path: models/model.pkl
       hash: md5
@@ -203,7 +203,7 @@ stages:
       size: 4975
     - path: models/mlflow_run_id.json
       hash: md5
-      md5: 13462946d29cd9e71e368377c965dc95
+      md5: f66b3a9c2c1de2f3cbccf541930cb429
       size: 82
     - path: src/week_09_serving/baseline.py
       hash: md5

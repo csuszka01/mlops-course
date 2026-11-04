@@ -239,7 +239,7 @@ class _RejectsEveryFourth:
         return _Response(422 if self.calls % 4 == 0 else 200)
 
 
-@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
+#@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
 def test_online_score_sends_one_request_per_row():
     from week_09_serving.bench import online_score
 
@@ -253,7 +253,7 @@ def test_online_score_sends_one_request_per_row():
     assert result["rows_per_second"] == pytest.approx(20 / result["wall_clock_s"], rel=0.05)
 
 
-@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
+#@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
 def test_online_score_times_each_request():
     """An average hides the slow request; a time for each request shows it."""
     from week_09_serving.bench import online_score
@@ -268,7 +268,7 @@ def test_online_score_times_each_request():
     assert result["p50_ms"] <= result["p95_ms"] <= result["max_ms"]
 
 
-@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
+#@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
 def test_online_score_counts_failed_requests():
     """A rejected request never reaches the model, so it must not count as a scored row."""
     from week_09_serving.bench import online_score
@@ -277,7 +277,7 @@ def test_online_score_counts_failed_requests():
     assert result["failed"] == 5, f"5 of 20 requests got a 422; failed is {result['failed']}"
 
 
-@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
+#@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
 def test_online_score_sends_missing_values_as_null(client):
     """NaN is not valid JSON: a missing value must reach the service as null."""
     from week_09_serving.bench import online_score
@@ -287,7 +287,7 @@ def test_online_score_sends_missing_values_as_null(client):
     assert result["failed"] == 0, "the row with a missing insulin was rejected"
 
 
-@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
+#@pytest.mark.skip(reason="Exercise 3 — write online_score in bench.py, then delete this skip marker.")
 def test_online_score_runs_against_the_service(client):
     from week_09_serving.bench import online_score
 
