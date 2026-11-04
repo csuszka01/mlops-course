@@ -100,7 +100,21 @@ def create_app() -> FastAPI:
     #     and include "not ready" in its detail.
     #   - Otherwise, return status "ok", the schema version, and the values in
     #     `baked`: model_version, run_id, gate_verdict and `source` as model_source.
-    #
+    @app.get("/health")
+    def health():
+
+        if app.state.model == None:
+            raise HTTPException(status_code=503, detail="model not ready")
+
+        return HealthResponse(
+            status="ok",
+            schema_version=SCHEMA_VERSION,
+            model_version=baked["model_version"],
+            run_id=baked["run_id"],
+            gate_verdict=baked["gate_verdict"],
+            model_source=baked["source"]
+        )
+
     # For POST /predict, take a PredictionRequest and return a PredictionResponse.
     #   - FastAPI checks the request types before your function runs. Check the
     #     values with `validate_payload`.
@@ -114,6 +128,33 @@ def create_app() -> FastAPI:
     #     from `baked` and SCHEMA_VERSION as schema_version.
     # Reference: https://fastapi.tiangolo.com/tutorial/body/ and
     # https://fastapi.tiangolo.com/tutorial/handling-errors/
+
+    @app.post("/predict")
+    def predict(r: PredictionRequest):
+
+        # changed, pass a dict to both helpers
+        payload = r.model_dump()
+        report = validate_payload(payload)
+
+        if not report["passed"]:
+            raise HTTPException(status_code=422, detail={
+                "failures": report["by_check"],
+                "schema_version": SCHEMA_VERSION
+            })
+
+        # changed, build the frame from the dict
+        frame = payload_to_frame(payload)
+        pred_raw = app.state.model.predict_proba(frame[FEATURE_COLUMNS])
+
+        probability = round(float(pred_raw[0][1]), 4)
+        pred = 1 if probability >= 0.5 else 0
+
+        return PredictionResponse(
+            prediction=pred,
+            probability=probability,
+            model_version=baked["model_version"],
+            schema_version=SCHEMA_VERSION
+        )
 
     return app
 
