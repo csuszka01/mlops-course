@@ -53,9 +53,35 @@ acceptance:
   #   regression:     primary_metric, max_drop, also_report (a list of metric names)
   #   slice_rules:    min_support, min_positives, min_f1, max_f1_gap
   # A threshold that a constant "no diabetes" classifier clears is not a floor.
+  minimum:
+    accuracy: 0.72
+    f1: 0.60
+    roc_auc: 0.80
+
+  regression:
+    primary_metric: roc_auc
+    max_drop: 0.02
+    also_report: [accuracy, f1, recall]
+
+  slice_rules:
+    min_support: 30
+    min_positives: 10
+    min_f1: 0.50
+    max_f1_gap: 0.20 
 
   # TODO(student) Exercise 5: add a `fairness` block below `slice_rules`.
   # Run `make fairness` first. Under `fairness`, add one key per gated slice name
   # from `evaluation.slices`, holding that axis's limits: max_selection_rate_gap,
   # max_tpr_gap or max_equalized_odds_difference. An axis you leave out is only
   # reported.
+  fairness:
+    age_band:
+      max_selection_rate_gap: 0.35
+      max_tpr_gap: 0.25
+      max_equalized_odds_difference: 0.40
+    bmi_band:
+      max_selection_rate_gap: 0.50
+      max_tpr_gap: 0.70
+    insulin_missing:
+      max_selection_rate_gap: 0.05
+      max_tpr_gap: 0.20
