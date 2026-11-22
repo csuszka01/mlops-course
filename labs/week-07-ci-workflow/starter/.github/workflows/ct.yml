@@ -32,7 +32,7 @@ on:
 
 defaults:
   run:
-    working-directory: labs/week07-ci-workflow/starter
+    working-directory: labs/week-07-ci-workflow/starter
 
 jobs:
   retrain:
@@ -61,6 +61,6 @@ jobs:
         with:
           name: evidence
           path: |
-            labs/week07-ci-workflow/starter/metrics/
-            labs/week07-ci-workflow/starter/reports/
-            labs/week07-ci-workflow/starter/models/model.pkl
+            labs/week-07-ci-workflow/starter/metrics/
+            labs/week-07-ci-workflow/starter/reports/
+            labs/week-07-ci-workflow/starter/models/model.pkl
