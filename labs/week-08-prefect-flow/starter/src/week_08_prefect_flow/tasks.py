@@ -103,14 +103,21 @@ def _run_dvc(settings: Settings, *args: str) -> str:
 # `retry_jitter_factor` here, then decide which tasks below get them.
 # `tests/test_flows.py` asserts your answer — and asserts that the local,
 # deterministic tasks did NOT get them.
+#
+# a.) the model data, params, and evaluation does not change, so a retry will inevitably fail
+#       if the pipeline fails
+#
+# b.) model registration is not safe to repeat, you can end up with multiple versions.
+#       the task does not check for existing run id the version is based on.
+
 NETWORK_RETRIES = {
-    "retries": 0,
+    "retries": 3,
     # Doubling, so a service that is restarting gets a chance to finish.
-    # "retry_delay_seconds": exponential_backoff(backoff_factor=2),
+    "retry_delay_seconds": exponential_backoff(backoff_factor=2),
     # Jitter matters more than it looks. Without it, every task that failed at
     # the same moment retries at the same moment, and a service that fell over
     # because of load gets hit by the identical burst that felled it.
-    # "retry_jitter_factor": 0.5,
+    "retry_jitter_factor": 0.5,
 }
 
 
@@ -202,7 +209,16 @@ def read_params_used(settings: Settings, stage: str = "train") -> dict:
     # `stage` as one dictionary of name -> value, for example
     # {"train.C": 1.0, "train.family": "logreg"}. Read the file, not
     # params.yaml: the record must say what the stage used.
-    return {}
+
+    with (settings.project_root / "dvc.lock").open() as fh:
+        lock = yaml.safe_load(fh)
+
+    recorded = lock["stages"][stage].get("params") or {}
+
+    used = {}
+    for params in recorded.values():
+        used.update(params)
+    return used
 
 
 # ── Retries: the network edges, and nowhere else ────────────────────────────

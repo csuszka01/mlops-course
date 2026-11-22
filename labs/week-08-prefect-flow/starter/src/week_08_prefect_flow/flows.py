@@ -71,12 +71,26 @@ def training_flow(
     signature is a public API. Keep it to strings, numbers and booleans.
     """
     # TODO(student) Exercise 1 — wire the tasks together.
-    #
-    #   settings = load_settings()
-    #   build_dataset(settings)
-    #   verdict = run_pipeline(settings)
-    #   notify(settings, verdict)
-    #
+    settings = load_settings()
+    verdict: dict = {}
+    try:
+        committed = params_committed(settings)
+        if require_committed_params and not committed:
+            raise RuntimeError("params.yaml changes uncommitted, commit params.yaml first")
+
+        build_dataset(settings)
+        verdict = run_pipeline(settings)
+
+        params = read_params_used(settings)
+
+        notify(settings, verdict, params=params, committed=committed)
+        return verdict
+
+    except Exception as error:
+        notify(settings, verdict, error=str(error))
+        raise
+
+    
     # `notify` has to run on the failure path too. Wrap the body in
     # try/except, notify with the error, and re-raise. A flow that only
     # reports its successes is the Toy Story 2 backup with extra steps.
@@ -116,8 +130,7 @@ def scheduled_flow() -> dict:
     # `pull_data` first: a scheduled run cannot assume the workspace is up to
     # date, because nobody was here to make it so. Then the training flow,
     # with the flow parameter that refuses an uncommitted params.yaml.
-    #
-    # Do NOT register or promote here, and be ready to say why in a sentence
-    # that is not about credentials.
-    print("scheduled_flow is not implemented yet — see the TODO in flows.py (Exercise 5).")
-    return {}
+    settings = load_settings()
+    pull_data(settings)
+    verdict = training_flow(require_committed_params=True)
+    return verdict
