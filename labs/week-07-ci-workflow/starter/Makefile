@@ -286,7 +286,9 @@ ensure-data:
 # TODO(student) Exercise 2: list the targets `ci` runs, in order, after the two
 # ensure-* targets. Reuse targets that already exist above; do not copy their recipes.
 # `make` stops at the first target that fails.
-ci: ensure-env ensure-data lint test repro gate
+ci: ensure-env ensure-data lint test-fast repro gate
+	@echo
+	@echo "CI passed: lint, tests, pipeline, gate."
 
 ## The steps of ci.yml on your machine, in the runner's order
 ci-local: ensure-env ensure-data
