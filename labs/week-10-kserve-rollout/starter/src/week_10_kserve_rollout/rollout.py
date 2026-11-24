@@ -140,6 +140,8 @@ def publish_version(
     # unless `force` is true. Raise SystemExit with a message that starts with
     # "REFUSING to publish" and names the version and the verdict.
     # Raise before anything is written to the store.
+    if verdict != "GO" and not force:
+        raise SystemExit(f"REFUSING to publish, gate verdict = {verdict}, version = {version}")
 
     target = store_dir(settings) / version
     target.mkdir(parents=True, exist_ok=True)

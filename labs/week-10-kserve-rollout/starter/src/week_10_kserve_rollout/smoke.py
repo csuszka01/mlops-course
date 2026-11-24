@@ -119,7 +119,32 @@ def check_behaviour(client: Caller, *, min_spread: float = DEFAULT_MIN_SPREAD) -
     #   "behaviour.negative_is_negative"  the negative patient's prediction is 0
     #   "behaviour.not_a_constant"        the two probabilities differ by at least min_spread
     # Put the probabilities you saw in each Check's detail; check_identity above has the same shape.
-    raise NotImplementedError("Exercise 2: write check_behaviour() in smoke.py")
+    pos = client.post("/predict", json=CLEARLY_POSITIVE)
+    neg = client.post("/predict", json=CLEARLY_NEGATIVE)
+    if pos.status_code != 200:
+        return [Check("behaviour.positive", False, f"/predict returned {pos.status_code}")]
+    if neg.status_code != 200:
+        return [Check("behaviour.negative", False, f"/predict returned {neg.status_code}")]
+
+    pos_body, neg_body = pos.json(), neg.json()
+    p_pos, p_neg = pos_body["probability"], neg_body["probability"]
+    return [
+        Check(
+            "behaviour.positive_is_positive",
+            pos_body["prediction"] == 1,
+            f"prediction {pos_body['prediction']}, p={p_pos}",
+        ),
+        Check(
+            "behaviour.negative_is_negative",
+            neg_body["prediction"] == 0,
+            f"prediction {neg_body['prediction']}, p={p_neg}",
+        ),
+        Check(
+            "behaviour.not_a_constant",
+            abs(p_pos - p_neg) >= min_spread,
+            f"p_pos={p_pos}, p_neg={p_neg}, min spread {min_spread}",
+        ),
+    ]
 
 
 def check_protocol(client: Caller) -> list[Check]:

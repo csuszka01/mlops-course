@@ -112,7 +112,7 @@ services:
       AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
     command:
       - --backend-store-uri
-      - postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - --artifacts-destination
       - s3://${MLFLOW_BUCKET}
       - --host
@@ -159,6 +159,8 @@ services:
       PREFECT_SERVER_DATABASE_CONNECTION_URL: >-
         postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${PREFECT_DB:-prefectdb}
       PREFECT_SERVER_API_HOST: 0.0.0.0
+      # ADD this line, the UI uses it to find the API from the browser
+      PREFECT_UI_API_URL: http://127.0.0.1:${PREFECT_PORT:-5520}/api
     command: prefect server start --host 0.0.0.0 --port 4200
     ports:
       - "${PREFECT_PORT:-5520}:4200"
