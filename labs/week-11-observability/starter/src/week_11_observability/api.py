@@ -379,6 +379,8 @@ def create_app(registry: CollectorRegistry | None = None) -> FastAPI:
             # designed it to do. Counting a caller's bad data as our failure
             # would let anyone burn our error budget by sending rubbish.
             # TODO(student) Exercise 1 — count the violation, by CHECK NAME.
+            for check, count in report["by_check"].items():
+                metrics["violations"].labels(check=check).inc(count)
             #
             # `report["by_check"]` maps a check name to how many times it
             # failed. The label must be the check name — a small closed set
@@ -413,6 +415,9 @@ def create_app(registry: CollectorRegistry | None = None) -> FastAPI:
         # rather than the server: count the prediction by outcome
         # ("positive"/"negative", so the cardinality cost is 2) and observe the
         # probability on the score histogram.
+        outcome = "positive" if probability >= 0.5 else "negative"
+        metrics["predictions"].labels(outcome=outcome).inc()
+        metrics["score"].observe(probability)
 
         return PredictionResponse(
             prediction=int(probability >= 0.5),

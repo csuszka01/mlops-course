@@ -80,6 +80,13 @@ scrape_configs:
   #     hope for. Add a `service: diabetes-api` label while you are there — a
   #     label YOU attach, so a query can name the service without naming a
   #     container.
+  - job_name: diabetes-api
+    metrics_path: /metrics
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["api:8000"]
+        labels:
+          service: diabetes-api
   #
   # AND NOTE WHAT HAPPENS BEFORE YOU START THE CONTAINER. The `api` service sits
   # behind a Compose profile, so this target is DOWN on your first `make up` and

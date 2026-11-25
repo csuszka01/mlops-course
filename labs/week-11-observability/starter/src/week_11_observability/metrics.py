@@ -212,7 +212,8 @@ def route_label(request: Any) -> str:
     `route` in its scope: return UNMATCHED_ROUTE for it.
     Reference: https://www.starlette.io/routing/
     """
-    return request.url.path
+    route = request.scope.get("route")
+    return route.path if route is not None else UNMATCHED_ROUTE
 
 
 def make_middleware(
@@ -261,6 +262,11 @@ def make_middleware(
             # with its labels method and route. The declarations in
             # build_metrics() above list the label names.
             # Reference: https://prometheus.github.io/client_python/instrumenting/labels/
+            metrics["requests"].labels(
+                method=request.method, route=route, status=str(status)
+            ).inc()
+            metrics["latency"].labels(method=request.method, route=route).observe(elapsed)
+            
 
             logger.info(
                 json.dumps(
